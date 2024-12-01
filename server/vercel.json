@@ -5,7 +5,9 @@
       "src": "src/main.ts",
       "use": "@vercel/node",
       "config": {
-        "include": ["src/**/*"]
+        "include": ["src/**/*"],
+        "exclude": ["node_modules", "dist"],
+        "tsconfig": "tsconfig.json"
       }
     }
   ],
