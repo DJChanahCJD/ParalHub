@@ -10,7 +10,8 @@
       "src": "admin/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "admin/dist"
+        "distDir": "admin/dist",
+        "installCommand": "npm install --no-install-links --no-save --no-package-lock --ignore-scripts"
       }
     },
     {
