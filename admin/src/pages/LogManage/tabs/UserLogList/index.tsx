@@ -122,17 +122,9 @@ const UserLogList: React.FC = () => {
             sortOrder: sort[Object.keys(sort || {})[0]] as 'ascend' | 'descend',
           });
 
-          const logsWithAddress = response.data.data.map(item => ({
-            time: item.timestamp,
-            event: item.message || '未知',
-            ip: item.ip,
-            address: item.address || '未知',
-            success: item.success,
-          }));
-
           return {
-            data: logsWithAddress as UserLog[],
-            success: true,
+            data: response.data.data as unknown as UserLog[],
+            success: response.data.success,
             total: response.data.total,
           };
         } catch (error) {

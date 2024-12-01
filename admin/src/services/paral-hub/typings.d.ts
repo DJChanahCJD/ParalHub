@@ -362,23 +362,31 @@ interface CaseResponse {
   interface UserLogResponse {
     code: number;
     data: {
-      data: UserLogEntry[];
+      data: UserLog[];  // 直接使用 UserLog 接口
       total: number;
       success: boolean;
     };
     message?: string;
   }
 
+  // 用户日志条目类型
+  interface UserLog {
+    time: string;      // 注意这里是 time 而不是 timestamp
+    event: string;
+    address: string;
+    ip: string;
+    success: boolean;
+  }
+
   // 用户日志请求参数类型
   interface UserLogParams {
     current?: number;
     pageSize?: number;
-    event?: string;
-    success?: boolean;
     ip?: string;
     address?: string;
+    event?: string;
     type?: string;
-    keyword?: string;
+    success?: boolean;
     sortField?: string;
     sortOrder?: 'ascend' | 'descend';
   }

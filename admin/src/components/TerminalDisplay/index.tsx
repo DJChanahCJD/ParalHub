@@ -118,6 +118,7 @@ const TerminalDisplay: React.FC<TerminalDisplayProps> = ({
   };
 
   const formatContent = (logs: API.LogEntry[]): string => {
+    console.log('logs from terminal display', logs);
     return logs.map(formatLog).join('\n');
   };
 

@@ -19,7 +19,8 @@ export class LogController {
     private readonly logService: LogService,
     private readonly configService: ConfigService,
   ) {
-    this.isProduction = this.configService.get<string>('NODE_ENV') === 'production';
+    this.isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
   }
 
   private async getLocationByIp(ip: string): Promise<string> {
@@ -38,7 +39,6 @@ export class LogController {
       const response = await fetch(
         `http://ip-api.com/json/${ip}?lang=zh-CN&fields=status,message,country,regionName,city`,
       );
-
       const data = await response.json();
       if (data.status === 'success') {
         return `${data.country}${data.regionName}${data.city}`;
@@ -100,7 +100,11 @@ export class LogController {
 
   @Get()
   @SkipLogging()
-  async getLogs(@Query('type') type: string = 'system') {
+  async getLogs(
+    @Query('type') type: string = 'system',
+    @Query('current') current: number = 1,
+    @Query('pageSize') pageSize: number = 20,
+  ) {
     // 验证日志类型
     const validTypes = ['system', 'error', 'access', 'user'];
     if (!validTypes.includes(type)) {
@@ -109,16 +113,35 @@ export class LogController {
       );
     }
 
-    const safeLimit = 1000;
-
     try {
-      const result = await this.logService.readLogs(type, safeLimit);
+      // 直接获取日志数组
+      const logs = await this.logService.readLogs(type);
+
+      // 处理分页
+      const total = logs.length;
+      const startIndex = (current - 1) * pageSize;
+      const endIndex = startIndex + pageSize;
+      const pagedLogs = logs.slice(startIndex, endIndex);
+
+      // 格式化日志条目以匹配前端期望的格式
+      const formattedLogs = pagedLogs.map((log) => ({
+        timestamp: log.timestamp,
+        level: log.level.toUpperCase(), // 确保level是大写
+        message: log.message,
+        context: log.context,
+        metadata: log.metadata,
+        source: log.source || 'system',
+        repeatCount: log.repeatCount || 1,
+      }));
+      console.log('formattedLogs from controller', formattedLogs);
       return {
         code: 200,
         data: {
-          data: (result as any).data,
-          total: (result as any).data?.length || 0,
+          data: formattedLogs,
+          total,
           type,
+          hasMore: endIndex < total,
+          nextCursor: endIndex < total ? String(current + 1) : null,
         },
       };
     } catch (error) {
@@ -131,6 +154,8 @@ export class LogController {
           data: [],
           total: 0,
           type,
+          hasMore: false,
+          nextCursor: null,
         },
       };
     }
@@ -149,77 +174,83 @@ export class LogController {
     @Query('sortOrder') sortOrder?: 'ascend' | 'descend',
   ) {
     try {
-      const result = await this.logService.readLogs('system', 1000);
-      let logs = (result as any).data || [];
+      const logs = await this.logService.readLogs('system');
 
-      // 过滤并转换日志格式
-      logs = logs
-        .filter((log: any) => {
-          const message = log.message.toLowerCase();
-          return this.userEvents.some((event) => message.includes(event));
-        })
-        .map((log: any) => {
-          const ipAddress = log.metadata?.ip || '-';
-          const locationAddress = this.getLocationByIp(ipAddress);
-          return {
-            timestamp: log.timestamp,
-            message: log.message,
-            ip: ipAddress,
-            success: log.metadata?.status >= 200 && log.metadata?.status < 400,
-            address: locationAddress,
-            metadata: log.metadata,
-          };
+      // 过滤用户相关事件
+      let filteredLogs = logs.filter((log: any) => {
+        const message = log.message.toLowerCase();
+        return this.userEvents.some((eventPath) => {
+          const logPath = message.split(' ')[1];
+          return logPath && logPath.includes(eventPath.toLowerCase());
         });
+      });
 
-      // 应用IP过滤
+      // 简化日志格式，只保留需要的字段
+      filteredLogs = await Promise.all(
+        filteredLogs.map(async (log: any) => {
+          const ipAddress = log.metadata?.ip || '-';
+          return {
+            time: log.timestamp,
+            event: log.message.split(' ')[1] || '', // 只保留路径部分
+            ip: ipAddress,
+            address: (await this.getLocationByIp(ipAddress)) || '-',
+            success: log.metadata?.status >= 200 && log.metadata?.status < 400,
+          };
+        }),
+      );
+      console.log('filteredLogs from controller', filteredLogs);
+      // 应用过滤条件
       if (ip) {
-        logs = logs.filter((log) =>
+        filteredLogs = filteredLogs.filter((log) =>
           log.ip.toLowerCase().includes(ip.toLowerCase()),
         );
       }
 
-      // 应用地区过滤
       if (address) {
-        logs = logs.filter((log) =>
+        filteredLogs = filteredLogs.filter((log) =>
           log.address.toLowerCase().includes(address.toLowerCase()),
         );
       }
 
-      // 应用事件过滤
       if (event) {
-        logs = logs.filter((log) =>
-          log.message.toLowerCase().includes(event.toLowerCase()),
+        filteredLogs = filteredLogs.filter((log) =>
+          log.event.toLowerCase().includes(event.toLowerCase()),
         );
       }
 
-      // 应用状态过滤
       if (success !== undefined && success !== null) {
         const successValue = success === 'true';
-        logs = logs.filter((log) => log.success === successValue);
+        filteredLogs = filteredLogs.filter(
+          (log) => log.success === successValue,
+        );
       }
 
       // 应用排序
       if (sortField && sortOrder) {
-        logs.sort((a, b) => {
-          if (sortField === 'timestamp') {
+        filteredLogs.sort((a, b) => {
+          if (sortField === 'time') {
             return sortOrder === 'ascend'
-              ? new Date(a.timestamp).getTime() -
-                  new Date(b.timestamp).getTime()
-              : new Date(b.timestamp).getTime() -
-                  new Date(a.timestamp).getTime();
+              ? new Date(a.time).getTime() - new Date(b.time).getTime()
+              : new Date(b.time).getTime() - new Date(a.time).getTime();
           }
           const compareResult = String(a[sortField]).localeCompare(
             String(b[sortField]),
           );
           return sortOrder === 'ascend' ? compareResult : -compareResult;
         });
+      } else {
+        // 默认按时间倒序
+        filteredLogs.sort(
+          (a, b) =>
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+        );
       }
 
       // 计算分页
-      const total = logs.length;
+      const total = filteredLogs.length;
       const startIndex = (current - 1) * pageSize;
       const endIndex = startIndex + pageSize;
-      const pagedLogs = logs.slice(startIndex, endIndex);
+      const pagedLogs = filteredLogs.slice(startIndex, endIndex);
 
       return {
         code: 200,
