@@ -19,16 +19,20 @@ async function bootstrap() {
   });
 
   // 配置静态文件服务
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/', // 访问路径前缀
-  });
+  if (process.env.NODE_ENV !== 'production') {
+    app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+      prefix: '/uploads/', // 访问路径前缀
+    });
+  }
 
-  // 确保上传目录存在
-  const uploadDirs = ['avatars', 'articles'];
-  for (const dir of uploadDirs) {
-    const uploadDir = join(__dirname, '..', 'uploads', dir);
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+  // 只在开发环境下创建上传目录
+  if (process.env.NODE_ENV !== 'production') {
+    const uploadDirs = ['avatar', 'articles', 'images'];
+    for (const dir of uploadDirs) {
+      const uploadDir = join(__dirname, '..', 'uploads', dir);
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
     }
   }
 

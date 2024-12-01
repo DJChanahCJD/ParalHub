@@ -792,3 +792,8 @@
 {"timestamp":"2024-11-30T14:34:50.249Z","level":"info","message":"GET /admin/dashboard/overview","context":"HTTP","metadata":{"ip":"127.0.0.1","duration":1,"status":200,"response":{"success":true}}}
 {"timestamp":"2024-11-30T14:38:44.744Z","level":"info","message":"GET /user/current-user","context":"HTTP","metadata":{"ip":"127.0.0.1","duration":8,"status":200,"response":{"success":true}}}
 {"timestamp":"2024-11-30T14:38:46.605Z","level":"info","message":"GET /admin/dashboard/overview","context":"HTTP","metadata":{"ip":"127.0.0.1","duration":2,"status":200,"response":{"success":true}}}
+{"timestamp":"2024-12-01T04:36:12.181Z","level":"info","message":"GET /user/current-user","context":"HTTP","metadata":{"ip":"127.0.0.1","duration":53,"status":200,"response":{"success":true}}}
+{"timestamp":"2024-12-01T04:36:13.051Z","level":"info","message":"GET /admin/dashboard/overview","context":"HTTP","metadata":{"ip":"127.0.0.1","duration":156,"status":200,"response":{"success":true}}}
+{"timestamp":"2024-12-01T04:36:14.836Z","level":"info","message":"GET /admin/list","context":"HTTP","metadata":{"ip":"127.0.0.1","query":{"current":"1","pageSize":"10"},"duration":34,"status":200,"response":{"success":true,"total":25,"count":10}}}
+{"timestamp":"2024-12-01T04:36:17.955Z","level":"info","message":"GET /common/skills/all","context":"HTTP","metadata":{"ip":"127.0.0.1","duration":15,"status":200,"response":{"success":true}}}
+{"timestamp":"2024-12-01T04:36:18.043Z","level":"info","message":"GET /developer/list","context":"HTTP","metadata":{"ip":"127.0.0.1","query":{"current":"1","pageSize":"10","sortOrder":"desc"},"duration":15,"status":200,"response":{"success":true,"total":4,"count":4}}}
