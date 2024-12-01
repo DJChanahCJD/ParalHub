@@ -1,0 +1,35 @@
+{
+  "buildCommand": "npm run build:all",
+  "outputDirectory": "dist",
+  "builds": [
+    {
+      "src": "server/src/main.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "admin/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "admin/dist"
+      }
+    },
+    {
+      "src": "website/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "server/src/main.ts"
+    },
+    {
+      "src": "/admin/(.*)",
+      "dest": "admin/dist/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "website/$1"
+    }
+  ]
+}

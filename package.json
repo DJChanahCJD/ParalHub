@@ -1,0 +1,13 @@
+{
+  "name": "paralhub",
+  "private": true,
+  "scripts": {
+    "build:server": "cd server && npm install && npm run build",
+    "build:admin": "cd admin && npm install && npm run build",
+    "build:website": "cd website && npm install && npm run build",
+    "build:all": "npm run build:server && npm run build:admin && npm run build:website"
+  },
+  "dependencies": {
+    "paralhub": "file:"
+  }
+}

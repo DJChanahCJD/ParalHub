@@ -18,6 +18,10 @@ async function bootstrap() {
     logger: ['error', 'warn', 'debug', 'log', 'verbose'],
   });
 
+  app.useStaticAssets(join(__dirname, '..', 'public'), {
+    prefix: '/favicon.ico',
+  });
+
   // 配置静态文件服务
   if (process.env.NODE_ENV !== 'production') {
     app.useStaticAssets(join(__dirname, '..', 'uploads'), {
