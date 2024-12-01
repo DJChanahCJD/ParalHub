@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { ArticleQuery } from 'src/dto/pagination';
-import { Article } from 'src/schema/article.schema';
-import { Case } from 'src/schema/case.schema';
-import { NotificationService } from 'src/provider/notification/notification.service';
-import { ModelName, getCollectionName } from 'src/utils/model-name.util';
+import { ArticleQuery } from '../../dto/pagination';
+import { Article } from '../../schema/article.schema';
+import { Case } from '../../schema/case.schema';
+import { NotificationService } from '../../provider/notification/notification.service';
+import { ModelName, getCollectionName } from '../../utils/model-name.util';
 
 @Injectable()
 export class ArticleProvider {

@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Param, Query, UseGuards } from '@nestjs/common';
-import { NotificationService } from 'src/provider/notification/notification.service';
-import { JwtAuthGuard } from 'src/guards/auth.guard';
-import { CurrentUser } from 'src/decorators/user.decorator';
-import { JwtPayload } from '@/types/auth.types';
-import { NotificationResponse } from 'src/types/notification.types';
+import { NotificationService } from '../provider/notification/notification.service';
+import { JwtAuthGuard } from '../guards/auth.guard';
+import { CurrentUser } from '../decorators/user.decorator';
+import { JwtPayload } from '../types/auth.types';
+import { NotificationResponse } from '../types/notification.types';
 
 @UseGuards(JwtAuthGuard)
 @Controller('notifications')

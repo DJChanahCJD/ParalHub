@@ -8,7 +8,7 @@ import {
   AdminUserSchema,
   DeveloperUserSchema,
   EnterpriseUserSchema,
-} from 'src/schema/users.schema';
+} from '../schema/users.schema';
 
 @Module({
   imports: [

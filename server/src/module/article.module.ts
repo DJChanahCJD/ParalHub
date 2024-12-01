@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Article, ArticleSchema } from 'src/schema/article.schema';
-import { Case, CaseSchema } from 'src/schema/case.schema';
-import { ArticleController } from 'src/controller/article.controller';
-import { ArticleProvider } from 'src/provider/article/article.provider';
+import { Article, ArticleSchema } from '../schema/article.schema';
+import { Case, CaseSchema } from '../schema/case.schema';
+import { ArticleController } from '../controller/article.controller';
+import { ArticleProvider } from '../provider/article/article.provider';
 import { NotificationModule } from './notification.module';
 @Module({
   imports: [

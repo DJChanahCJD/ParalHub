@@ -11,15 +11,15 @@ import {
   ValidationPipe,
   UseGuards,
 } from '@nestjs/common';
-import { CaseProvider } from 'src/provider/case/case.provider';
-import { Case } from 'src/schema/case.schema';
-import { CommonProvider } from 'src/provider/common/common.provider';
-import { ArticleQuery, CaseQuery } from 'src/dto/pagination';
-import { JwtAuthGuard } from 'src/guards/auth.guard';
-import { CurrentUser } from 'src/decorators/user.decorator';
-import { JwtPayload } from '@/types/auth.types';
-import { ArticleProvider } from '@provider/article/article.provider';
-import { Public } from '@/decorators/public.decorator';
+import { CaseProvider } from '../provider/case/case.provider';
+import { Case } from '../schema/case.schema';
+import { CommonProvider } from '../provider/common/common.provider';
+import { ArticleQuery, CaseQuery } from '../dto/pagination';
+import { JwtAuthGuard } from '../guards/auth.guard';
+import { CurrentUser } from '../decorators/user.decorator';
+import { JwtPayload } from '../types/auth.types';
+import { ArticleProvider } from '../provider/article/article.provider';
+import { Public } from '../decorators/public.decorator';
 @Controller('/case')
 @UseGuards(JwtAuthGuard)
 export class CaseController {

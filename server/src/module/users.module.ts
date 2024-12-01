@@ -6,19 +6,19 @@ import { RedisModule } from './redis.module';
 import { AuthModule } from './auth.module';
 
 // Controllers
-import { AdminUsersController } from 'src/controller/users/admin.controller';
-import { DeveloperUsersController } from 'src/controller/users/developer.controller';
-import { EnterpriseUsersController } from 'src/controller/users/enterprise.controller';
-import { PublicUsersController } from 'src/controller/users/user.controller';
+import { AdminUsersController } from '../controller/users/admin.controller';
+import { DeveloperUsersController } from '../controller/users/developer.controller';
+import { EnterpriseUsersController } from '../controller/users/enterprise.controller';
+import { PublicUsersController } from '../controller/users/user.controller';
 
 // Services & Providers
-import { UsersService } from 'src/provider/users/users.service';
-import { AdminUserProvider } from 'src/provider/users/admin.provider';
-import { DeveloperUserProvider } from 'src/provider/users/developer.provider';
-import { EnterpriseUserProvider } from 'src/provider/users/enterprise.provider';
-import { UserFactoryProvider } from 'src/provider/users/user-factory.provider';
-import { Skill, SkillSchema } from 'src/schema/common.schema';
-import { UploadService } from 'src/provider/upload/upload.service';
+import { UsersService } from '../provider/users/users.service';
+import { AdminUserProvider } from '../provider/users/admin.provider';
+import { DeveloperUserProvider } from '../provider/users/developer.provider';
+import { EnterpriseUserProvider } from '../provider/users/enterprise.provider';
+import { UserFactoryProvider } from '../provider/users/user-factory.provider';
+import { Skill, SkillSchema } from '../schema/common.schema';
+import { UploadService } from '../provider/upload/upload.service';
 import { CacheModule } from '@nestjs/cache-manager';
 // Models
 import {
@@ -28,7 +28,7 @@ import {
   DeveloperUserSchema,
   EnterpriseUser,
   EnterpriseUserSchema,
-} from 'src/schema/users.schema';
+} from '../schema/users.schema';
 import { MailModule } from './mail.module';
 @Module({
   imports: [

@@ -1,12 +1,12 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { UsersService } from 'src/provider/users/users.service';
+import { UsersService } from '../../provider/users/users.service';
 import { Body, Param, Post, Put, Delete } from '@nestjs/common';
-import { EnterpriseUserProvider } from 'src/provider/users/enterprise.provider';
-import { EnterpriseUser, UserRole } from 'src/schema/users.schema';
-import { EnterpriseListParams, ResetPasswordDto } from 'src/types/user';
-import { Public } from '@/decorators/public.decorator';
-import { LoginUserDto, RegisterEnterpriseUserDto } from 'src/types/user';
-import { JwtAuthGuard } from '@/guards/auth.guard';
+import { EnterpriseUserProvider } from '../../provider/users/enterprise.provider';
+import { EnterpriseUser, UserRole } from '../../schema/users.schema';
+import { EnterpriseListParams, ResetPasswordDto } from '../../types/user';
+import { Public } from '../../decorators/public.decorator';
+import { LoginUserDto, RegisterEnterpriseUserDto } from '../../types/user';
+import { JwtAuthGuard } from '../../guards/auth.guard';
 
 @Controller('/enterprise')
 @UseGuards(JwtAuthGuard)

@@ -10,15 +10,15 @@ import {
   UseGuards,
   BadRequestException,
 } from '@nestjs/common';
-import { NoticeProvider } from 'src/provider/notice/notice.provider';
-import { Notice } from 'src/schema/notice.schema';
-import { AuthService } from '@/module/auth/auth.service';
+import { NoticeProvider } from '../provider/notice/notice.provider';
+import { Notice } from '../schema/notice.schema';
+import { AuthService } from '../module/auth/auth.service';
 import { Types } from 'mongoose';
-import { NoticeQuery } from 'src/dto/pagination';
-import { JwtAuthGuard } from 'src/guards/auth.guard';
-import { CurrentUser } from 'src/decorators/user.decorator';
-import { JwtPayload } from '@/types/auth.types';
-import { Public } from '@/decorators/public.decorator';
+import { NoticeQuery } from '../dto/pagination';
+import { JwtAuthGuard } from '../guards/auth.guard';
+import { CurrentUser } from '../decorators/user.decorator';
+import { JwtPayload } from '../types/auth.types';
+import { Public } from '../decorators/public.decorator';
 
 @Controller('notice')
 @UseGuards(JwtAuthGuard)

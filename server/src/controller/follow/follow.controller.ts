@@ -1,4 +1,4 @@
-import { JwtPayload } from '@/types/auth.types';
+import { JwtPayload } from '../../types/auth.types';
 import {
   Controller,
   Get,
@@ -10,11 +10,11 @@ import {
   UseGuards,
   ForbiddenException,
 } from '@nestjs/common';
-import { UserRole } from '@schema/users.schema';
-import { CurrentUser } from 'src/decorators/user.decorator';
-import { FollowQuery } from 'src/dto/pagination';
-import { JwtAuthGuard } from 'src/guards/auth.guard';
-import { FollowProvider } from 'src/provider/follow/follow.provider';
+import { UserRole } from '../../schema/users.schema';
+import { CurrentUser } from '../../decorators/user.decorator';
+import { FollowQuery } from '../../dto/pagination';
+import { JwtAuthGuard } from '../../guards/auth.guard';
+import { FollowProvider } from '../../provider/follow/follow.provider';
 
 @Controller('follows')
 export class FollowController {

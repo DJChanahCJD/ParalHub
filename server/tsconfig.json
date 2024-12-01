@@ -12,13 +12,6 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"],
-      "@scripts/*": ["src/scripts/*"],
-      "@utils/*": ["src/utils/*"],
-      "@schema/*": ["src/schema/*"],
-      "@provider/*": ["src/provider/*"],
-      "@module/*": ["src/module/*"],
-      "@controller/*": ["src/controller/*"],
-      "@types/*": ["src/types/*"]
     },
     "incremental": true,
     "skipLibCheck": true,

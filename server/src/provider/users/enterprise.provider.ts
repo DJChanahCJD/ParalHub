@@ -5,16 +5,16 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { BaseUserProvider } from './base-user.provider';
-import { EnterpriseUser } from 'src/schema/users.schema';
+import { EnterpriseUser } from '../../schema/users.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { MailerService } from '@nestjs-modules/mailer';
-import { AuthService } from '@/module/auth/auth.service';
+import { AuthService } from '../../module/auth/auth.service';
 import { Model } from 'mongoose';
 import { RedisClientType } from 'redis';
 import { Inject } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { UserRole } from 'src/schema/users.schema';
-import { RegisterEnterpriseUserDto } from 'src/types/user';
+import { UserRole } from '../../schema/users.schema';
+import { RegisterEnterpriseUserDto } from '../../types/user';
 
 @Injectable()
 export class EnterpriseUserProvider extends BaseUserProvider<EnterpriseUser> {

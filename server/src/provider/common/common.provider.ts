@@ -5,7 +5,7 @@ import {
   IndustryListParams,
   SkillListParams,
   TagListParams,
-} from 'src/types/common';
+} from '../../types/common';
 import {
   Skill,
   Industry,
@@ -16,7 +16,7 @@ import {
   Tag,
   TagDocument,
   ITag,
-} from 'src/schema/common.schema';
+} from '../../schema/common.schema';
 
 @Injectable()
 export class CommonProvider {

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { DashboardController } from 'src/controller/dashboard.controller';
-import { DashboardService } from 'src/provider/dashboard/dashboard.service';
-import { Case, CaseSchema } from 'src/schema/case.schema';
-import { Article, ArticleSchema } from 'src/schema/article.schema';
+import { DashboardController } from '../controller/dashboard.controller';
+import { DashboardService } from '../provider/dashboard/dashboard.service';
+import { Case, CaseSchema } from '../schema/case.schema';
+import { Article, ArticleSchema } from '../schema/article.schema';
 import {
   AdminUser,
   AdminUserSchema,
@@ -11,7 +11,7 @@ import {
   DeveloperUserSchema,
   EnterpriseUser,
   EnterpriseUserSchema,
-} from 'src/schema/users.schema';
+} from '../schema/users.schema';
 @Module({
   imports: [
     MongooseModule.forFeature([

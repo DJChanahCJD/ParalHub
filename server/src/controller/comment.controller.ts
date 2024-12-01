@@ -8,14 +8,14 @@ import {
   UseGuards,
   Delete,
 } from '@nestjs/common';
-import { CurrentUser } from 'src/decorators/user.decorator';
-import { CommentService } from 'src/provider/comment/comment.service';
-import { ArticleCommentQuery, ReplyQuery } from 'src/dto/pagination';
-import { JwtAuthGuard } from 'src/guards/auth.guard';
-import { JwtPayload } from '@/types/auth.types';
-import { CreateCommentDto, CreateReplyDto } from 'src/dto/comment';
-import { AdminCommentQuery } from 'src/dto/admin.comment';
-import { Public } from '@/decorators/public.decorator';
+import { CurrentUser } from '../decorators/user.decorator';
+import { CommentService } from '../provider/comment/comment.service';
+import { ArticleCommentQuery, ReplyQuery } from '../dto/pagination';
+import { JwtAuthGuard } from '../guards/auth.guard';
+import { JwtPayload } from '../types/auth.types';
+import { CreateCommentDto, CreateReplyDto } from '../dto/comment';
+import { AdminCommentQuery } from '../dto/admin.comment';
+import { Public } from '../decorators/public.decorator';
 @Controller('comment')
 @UseGuards(JwtAuthGuard)
 export class CommentController {

@@ -13,8 +13,8 @@ import {
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createUploadConfig } from '../config/upload.config';
-import { UploadService } from 'src/provider/upload/upload.service';
-import { JwtAuthGuard } from 'src/guards/auth.guard';
+import { UploadService } from '../provider/upload/upload.service';
+import { JwtAuthGuard } from '../guards/auth.guard';
 import { join } from 'path';
 import { promises as fs } from 'fs';
 

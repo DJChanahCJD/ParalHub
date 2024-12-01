@@ -1,4 +1,4 @@
-import { UserRole } from '@schema/users.schema';
+import { UserRole } from '../schema/users.schema';
 
 export interface JwtPayload {
   userId: string;

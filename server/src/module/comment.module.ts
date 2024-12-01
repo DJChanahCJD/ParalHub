@@ -5,15 +5,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import {
   CommentController,
   AdminCommentController,
-} from 'src/controller/comment.controller';
-import { CommentService } from 'src/provider/comment/comment.service';
+} from '../controller/comment.controller';
+import { CommentService } from '../provider/comment/comment.service';
 import {
   BaseComment,
   BaseCommentSchema,
   CommentSchema,
   ReplySchema,
-} from 'src/schema/comment.schema';
-import { Article, ArticleSchema } from 'src/schema/article.schema';
+} from '../schema/comment.schema';
+import { Article, ArticleSchema } from '../schema/article.schema';
 import { DatabaseModule } from './database.module';
 
 @Module({

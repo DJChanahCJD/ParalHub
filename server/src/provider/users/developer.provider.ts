@@ -1,16 +1,16 @@
 import { BadRequestException, Injectable, forwardRef } from '@nestjs/common';
 import { BaseUserProvider } from './base-user.provider';
-import { DeveloperUser } from 'src/schema/users.schema';
+import { DeveloperUser } from '../../schema/users.schema';
 import { Model } from 'mongoose';
 import { MailerService } from '@nestjs-modules/mailer';
 import { InjectModel } from '@nestjs/mongoose';
-import { AuthService } from '@/module/auth/auth.service';
+import { AuthService } from '../../module/auth/auth.service';
 import * as bcrypt from 'bcrypt';
 import { RedisClientType } from 'redis';
 import { Inject } from '@nestjs/common';
-import { RegisterDeveloperUserDto } from 'src/types/user';
-import { UserRole } from 'src/schema/users.schema';
-import { Skill } from 'src/schema/common.schema';
+import { RegisterDeveloperUserDto } from '../../types/user';
+import { UserRole } from '../../schema/users.schema';
+import { Skill } from '../../schema/common.schema';
 
 @Injectable()
 export class DeveloperUserProvider extends BaseUserProvider<DeveloperUser> {

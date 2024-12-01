@@ -10,15 +10,15 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { Express } from 'express';
-import { Public } from '@/decorators/public.decorator';
-import { UsersService } from 'src/provider/users/users.service';
-import { UserRole } from 'src/schema/users.schema';
-import { JwtAuthGuard } from 'src/guards/auth.guard';
-import { CurrentUser } from 'src/decorators/user.decorator';
+import { Public } from '../../decorators/public.decorator';
+import { UsersService } from '../../provider/users/users.service';
+import { UserRole } from '../../schema/users.schema';
+import { JwtAuthGuard } from '../../guards/auth.guard';
+import { CurrentUser } from '../../decorators/user.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createUploadConfig } from 'src/config/upload.config';
-import { UploadService } from 'src/provider/upload/upload.service';
-import { JwtPayload } from '@/types/auth.types';
+import { createUploadConfig } from '../../config/upload.config';
+import { UploadService } from '../../provider/upload/upload.service';
+import { JwtPayload } from '../../types/auth.types';
 
 @Controller('user')
 @UseGuards(JwtAuthGuard)

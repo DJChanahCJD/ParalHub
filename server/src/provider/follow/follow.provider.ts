@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Follow } from '@schema/follow.schema';
+import { Follow } from '../../schema/follow.schema';
 import { Connection, Model, Types } from 'mongoose';
 
 @Injectable()

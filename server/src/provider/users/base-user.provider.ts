@@ -6,16 +6,16 @@ import {
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { MailerService } from '@nestjs-modules/mailer';
-import { BaseUser } from 'src/schema/users.schema';
+import { BaseUser } from '../../schema/users.schema';
 import * as bcrypt from 'bcrypt';
 import {
   LoginResponseDto,
   LoginUserDto,
   ResetPasswordDto,
-} from 'src/types/user';
-import { emailTemplate } from '@utils/emaili';
+} from '../../types/user';
+import { emailTemplate } from '../../utils/emaili';
 import { Inject } from '@nestjs/common';
-import { AuthService } from '@/module/auth/auth.service';
+import { AuthService } from '../../module/auth/auth.service';
 import { RedisClientType } from 'redis';
 
 @Injectable()

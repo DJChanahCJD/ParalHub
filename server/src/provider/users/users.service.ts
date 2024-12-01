@@ -4,7 +4,7 @@ import {
   LoginUserDto,
   LoginResponseDto,
   ResetPasswordDto,
-} from 'src/types/user';
+} from '../../types/user';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
@@ -12,7 +12,7 @@ import {
   DeveloperUser,
   EnterpriseUser,
   UserRole,
-} from 'src/schema/users.schema';
+} from '../../schema/users.schema';
 import { AdminUserProvider } from './admin.provider';
 @Injectable()
 export class UsersService {

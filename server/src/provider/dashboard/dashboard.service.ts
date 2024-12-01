@@ -1,13 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, PipelineStage } from 'mongoose';
-import { Case } from 'src/schema/case.schema';
-import { Article } from 'src/schema/article.schema';
+import { Case } from '../../schema/case.schema';
+import { Article } from '../../schema/article.schema';
 import {
   AdminUser,
   DeveloperUser,
   EnterpriseUser,
-} from 'src/schema/users.schema';
+} from '../../schema/users.schema';
 import { RedisClientType } from 'redis';
 
 @Injectable()

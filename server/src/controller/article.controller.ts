@@ -11,14 +11,14 @@ import {
   BadRequestException,
   UseGuards,
 } from '@nestjs/common';
-import { ArticleProvider } from 'src/provider/article/article.provider';
-import { Article } from 'src/schema/article.schema';
-import { CommonProvider } from 'src/provider/common/common.provider';
-import { JwtAuthGuard } from 'src/guards/auth.guard';
-import { CurrentUser } from 'src/decorators/user.decorator';
-import { JwtPayload } from '@/types/auth.types';
-import { ArticleQuery } from 'src/dto/pagination';
-import { Public } from '@/decorators/public.decorator';
+import { ArticleProvider } from '../provider/article/article.provider';
+import { Article } from '../schema/article.schema';
+import { CommonProvider } from '../provider/common/common.provider';
+import { JwtAuthGuard } from '../guards/auth.guard';
+import { CurrentUser } from '../decorators/user.decorator';
+import { JwtPayload } from '../types/auth.types';
+import { ArticleQuery } from '../dto/pagination';
+import { Public } from '../decorators/public.decorator';
 
 @Controller('article')
 @UseGuards(JwtAuthGuard)

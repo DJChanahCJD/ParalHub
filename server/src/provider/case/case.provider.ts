@@ -1,12 +1,12 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Case } from 'src/schema/case.schema';
-import { UsersService } from 'src/provider/users/users.service';
-import { Article } from 'src/schema/article.schema';
-import { CaseQuery } from 'src/dto/pagination';
-import { NotificationService } from 'src/provider/notification/notification.service';
-import { getCollectionName, ModelName } from '@/utils/model-name.util';
+import { Case } from '../../schema/case.schema';
+import { UsersService } from '../../provider/users/users.service';
+import { Article } from '../../schema/article.schema';
+import { CaseQuery } from '../../dto/pagination';
+import { NotificationService } from '../../provider/notification/notification.service';
+import { getCollectionName, ModelName } from '../../utils/model-name.util';
 
 @Injectable()
 export class CaseProvider {

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { defaultAvatarUrl } from '@utils/avatar';
+import { defaultAvatarUrl } from '../utils/avatar';
 // 定义角色枚举
 export enum UserRole {
   ADMIN = 'admin',

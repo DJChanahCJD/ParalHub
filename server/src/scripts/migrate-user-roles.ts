@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { MigrationModule } from './migration.module';
 import { Connection } from 'mongoose';
 import { getConnectionToken } from '@nestjs/mongoose';
-import { UserRole } from 'src/schema/users.schema';
+import { UserRole } from '../schema/users.schema';
 
 async function migrate() {
   try {

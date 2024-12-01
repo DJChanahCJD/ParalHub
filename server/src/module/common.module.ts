@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common';
-import { CommonProvider } from 'src/provider/common/common.provider';
-import { CommonOptionsController } from 'src/controller/common.controller';
+import { CommonProvider } from '../provider/common/common.provider';
+import { CommonOptionsController } from '../controller/common.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
   Skill,
@@ -9,7 +9,7 @@ import {
   IndustrySchema,
   Tag,
   TagSchema,
-} from 'src/schema/common.schema';
+} from '../schema/common.schema';
 @Global()
 @Module({
   imports: [

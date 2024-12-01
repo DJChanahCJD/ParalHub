@@ -15,9 +15,9 @@ import {
   IndustryListParams,
   SkillListParams,
   TagListParams,
-} from 'src/types/common';
-import { Public } from '@/decorators/public.decorator';
-import { JwtAuthGuard } from '@/guards/auth.guard';
+} from '../types/common';
+import { Public } from '../decorators/public.decorator';
+import { JwtAuthGuard } from '../guards/auth.guard';
 @Controller('/common')
 @UseGuards(JwtAuthGuard)
 export class CommonOptionsController {

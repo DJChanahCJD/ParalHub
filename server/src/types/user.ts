@@ -1,5 +1,5 @@
 import { IsEmail, IsString, MinLength } from 'class-validator';
-import { BaseUser } from 'src/schema/users.schema';
+import { BaseUser } from '../schema/users.schema';
 
 // ================ 基础 DTO ================
 export class BaseResponseDto {

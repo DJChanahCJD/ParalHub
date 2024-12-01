@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { NoticeController } from 'src/controller/notice.controller';
-import { NoticeProvider } from 'src/provider/notice/notice.provider';
-import { Notice, NoticeSchema } from 'src/schema/notice.schema';
+import { NoticeController } from '../controller/notice.controller';
+import { NoticeProvider } from '../provider/notice/notice.provider';
+import { Notice, NoticeSchema } from '../schema/notice.schema';
 import { AuthModule } from './auth.module';
 
 @Module({

@@ -5,10 +5,10 @@ import {
   BadRequestException,
   UseGuards,
 } from '@nestjs/common';
-import { LogService } from 'src/provider/log/log.service';
-import { SkipLogging } from 'src/provider/log/skip-logging.decorator';
+import { LogService } from '../provider/log/log.service';
+import { SkipLogging } from '../provider/log/skip-logging.decorator';
 import * as geoip from 'geoip-lite';
-import { JwtAuthGuard } from '@/guards/auth.guard';
+import { JwtAuthGuard } from '../guards/auth.guard';
 
 @Controller('/log')
 @UseGuards(JwtAuthGuard)

@@ -8,17 +8,17 @@ import {
   Body,
   UseGuards,
 } from '@nestjs/common';
-import { UsersService } from 'src/provider/users/users.service';
-import { DeveloperUserProvider } from 'src/provider/users/developer.provider';
+import { UsersService } from '../../provider/users/users.service';
+import { DeveloperUserProvider } from '../../provider/users/developer.provider';
 import {
   DeveloperListParams,
   LoginUserDto,
   RegisterDeveloperUserDto,
   ResetPasswordDto,
-} from 'src/types/user';
-import { DeveloperUser, UserRole } from 'src/schema/users.schema';
-import { Public } from '@/decorators/public.decorator';
-import { JwtAuthGuard } from 'src/guards/auth.guard';
+} from '../../types/user';
+import { DeveloperUser, UserRole } from '../../schema/users.schema';
+import { Public } from '../../decorators/public.decorator';
+import { JwtAuthGuard } from '../../guards/auth.guard';
 @Controller('/developer')
 @UseGuards(JwtAuthGuard)
 export class DeveloperUsersController {

@@ -10,12 +10,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UsersService } from 'src/provider/users/users.service';
-import { AdminUserProvider } from 'src/provider/users/admin.provider';
-import { AdminUser, UserRole } from 'src/schema/users.schema';
-import { AdminListParams, LoginUserDto } from 'src/types/user';
-import { Public } from '@/decorators/public.decorator';
-import { JwtAuthGuard } from '@/guards/auth.guard';
+import { UsersService } from '../../provider/users/users.service';
+import { AdminUserProvider } from '../../provider/users/admin.provider';
+import { AdminUser, UserRole } from '../../schema/users.schema';
+import { AdminListParams, LoginUserDto } from '../../types/user';
+import { Public } from '../../decorators/public.decorator';
+import { JwtAuthGuard } from '../../guards/auth.guard';
 
 /**
  * 后台管理员用户控制器
