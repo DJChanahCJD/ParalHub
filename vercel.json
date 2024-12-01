@@ -1,28 +1,35 @@
 {
-  "buildCommand": "npm run build:all",
-  "outputDirectory": "dist",
+  "version": 2,
   "builds": [
     {
       "src": "server/src/main.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "buildCommand": "cd server && npm install && npm run build",
+        "outputDirectory": "server/dist"
+      }
     },
     {
       "src": "admin/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "admin/dist",
-        "installCommand": "npm install --no-install-links --no-save --no-package-lock --ignore-scripts"
+        "buildCommand": "cd admin && npm install && npm run build",
+        "distDir": "admin/dist"
       }
     },
     {
       "src": "website/package.json",
-      "use": "@vercel/next"
+      "use": "@vercel/next",
+      "config": {
+        "buildCommand": "cd website && npm install && npm run build",
+        "outputDirectory": "website/.next"
+      }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "server/src/main.ts"
+      "dest": "server/dist/main.js"
     },
     {
       "src": "/admin/(.*)",
@@ -32,5 +39,8 @@
       "src": "/(.*)",
       "dest": "website/$1"
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
