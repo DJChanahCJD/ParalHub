@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { join } from 'path';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 import { promises as fs } from 'fs';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
@@ -80,10 +80,10 @@ export class UploadService {
     file: Express.Multer.File,
     options: UploadOptions,
   ): Promise<string> {
-    const { type, width, height, quality, oldUrl } = options;
+    const { type, width, height, oldUrl } = options;
     const folder = type === 'avatar' ? 'avatars' : 'articles';
 
-    // 如果存在旧文件，先从 Cloudinary 删除
+    // 如果存在旧文件，先删除
     if (oldUrl) {
       const publicId = this.getPublicIdFromUrl(oldUrl);
       if (publicId) {
@@ -92,18 +92,30 @@ export class UploadService {
     }
 
     // 上传到 Cloudinary
-    const result = await cloudinary.uploader.upload(file.path, {
-      folder,
-      transformation: [
-        {
-          width,
-          height,
-          crop: 'fill',
-          quality,
-        },
-      ],
-    });
+    const result = await cloudinary.uploader
+      .upload(file.path, {
+        folder,
+        public_id: `${type}_${Date.now()}`, // 添加自定义文件名
+        resource_type: 'auto',
+        // 使用官方推荐的优化参数
+        fetch_format: 'auto',
+        quality: 'auto',
+        transformation: [
+          {
+            width,
+            height,
+            crop: 'fill',
+            gravity: 'auto', // 自动选择裁剪焦点
+            quality: 'auto',
+          },
+        ],
+      })
+      .catch((error) => {
+        this.logger.error('Cloudinary upload failed:', error);
+        throw new Error('文件上传失败');
+      });
 
+    // 返回优化后的 URL
     return result.secure_url;
   }
 
@@ -133,15 +145,11 @@ export class UploadService {
       const compressedFileName = `compressed_${file.filename}`;
       const outputPath = join(outputDir, compressedFileName);
 
-      const sharpInstance = sharp(file.path);
-      if (width || height) {
-        sharpInstance.resize(width, height, {
+      await sharp(file.buffer || file.path)
+        .resize(width, height, {
           fit: 'cover',
           position: 'center',
-        });
-      }
-
-      await sharpInstance
+        })
         .jpeg({ quality, progressive: true })
         .toFile(outputPath);
 
