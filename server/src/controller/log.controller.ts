@@ -7,13 +7,48 @@ import {
 } from '@nestjs/common';
 import { LogService } from '../provider/log/log.service';
 import { SkipLogging } from '../provider/log/skip-logging.decorator';
-import * as geoip from 'geoip-lite';
 import { JwtAuthGuard } from '../guards/auth.guard';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('/log')
 @UseGuards(JwtAuthGuard)
 export class LogController {
-  constructor(private readonly logService: LogService) {}
+  private readonly isProduction: boolean;
+
+  constructor(
+    private readonly logService: LogService,
+    private readonly configService: ConfigService,
+  ) {
+    this.isProduction = this.configService.get<string>('NODE_ENV') === 'production';
+  }
+
+  private async getLocationByIp(ip: string): Promise<string> {
+    // 处理本地IP
+    if (
+      ip === '127.0.0.1' ||
+      ip === 'localhost' ||
+      ip.startsWith('192.168.') ||
+      ip.startsWith('10.')
+    ) {
+      return '本地网络';
+    }
+
+    try {
+      // 使用 fetch 直接请求 ip-api.com 的免费服务
+      const response = await fetch(
+        `http://ip-api.com/json/${ip}?lang=zh-CN&fields=status,message,country,regionName,city`,
+      );
+
+      const data = await response.json();
+      if (data.status === 'success') {
+        return `${data.country}${data.regionName}${data.city}`;
+      }
+    } catch (error) {
+      console.error('IP解析失败:', error);
+    }
+
+    return ip;
+  }
 
   private readonly userEvents = [
     // 认证相关
@@ -62,33 +97,6 @@ export class LogController {
     // 评论相关
     '/comment/',
   ];
-
-  private getLocationByIp(ip: string): string {
-    // 处理本地IP
-    if (
-      ip === '127.0.0.1' ||
-      ip === 'localhost' ||
-      ip.startsWith('192.168.') ||
-      ip.startsWith('10.')
-    ) {
-      return '本地网络';
-    }
-
-    try {
-      const geo = geoip.lookup(ip);
-      if (geo) {
-        // 中文环境
-        if (geo.country === 'CN') {
-          return `${geo.country}${geo.region}${geo.city}`;
-        }
-        // 国际环境
-        return `${geo.country}${geo.city ? `, ${geo.city}` : ''}`;
-      }
-    } catch (error) {
-      console.error('IP解析失败:', error);
-    }
-    return '未知地址';
-  }
 
   @Get()
   @SkipLogging()
@@ -141,7 +149,6 @@ export class LogController {
     @Query('sortOrder') sortOrder?: 'ascend' | 'descend',
   ) {
     try {
-      // 获取系统日志
       const result = await this.logService.readLogs('system', 1000);
       let logs = (result as any).data || [];
 
