@@ -6,23 +6,23 @@
       "use": "@vercel/node",
       "config": {
         "buildCommand": "cd server && npm install && npm run build",
-        "outputDirectory": "server/dist"
+        "outputDirectory": "dist"
       }
     },
     {
-      "src": "admin/package.json",
+      "src": "admin/**",
       "use": "@vercel/static-build",
       "config": {
         "buildCommand": "cd admin && npm install && npm run build",
-        "distDir": "admin/dist"
+        "outputDirectory": "dist"
       }
     },
     {
-      "src": "website/package.json",
+      "src": "website/**",
       "use": "@vercel/next",
       "config": {
         "buildCommand": "cd website && npm install && npm run build",
-        "outputDirectory": "website/.next"
+        "outputDirectory": ".next"
       }
     }
   ],
@@ -33,11 +33,11 @@
     },
     {
       "src": "/admin/(.*)",
-      "dest": "admin/dist/index.html"
+      "dest": "admin/dist/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "website/$1"
+      "dest": "website/.next/$1"
     }
   ],
   "env": {
