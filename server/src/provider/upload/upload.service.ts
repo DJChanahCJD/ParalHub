@@ -27,9 +27,8 @@ export class UploadService {
   private readonly logger = new Logger(UploadService.name);
   private readonly uploadBasePath: string;
   private readonly apiUrl: string;
-  private readonly accessLogPath: string;
   private readonly isProduction: boolean;
-
+  private readonly accessLogPath: string;
   constructor(private configService: ConfigService) {
     this.uploadBasePath = join(__dirname, '../../../uploads');
     this.apiUrl = this.configService.get<string>('API_URL');
@@ -44,18 +43,17 @@ export class UploadService {
         api_key: this.configService.get('CLOUDINARY_API_KEY'),
         api_secret: this.configService.get('CLOUDINARY_API_SECRET'),
       });
+    } else {
+      // 开发环境确保上传目录存在
+      this.ensureUploadDirs();
     }
-
-    // 确保 access_log.json 存在
-    this.initAccessLog();
   }
 
-  // 初始化访问日志文件
-  private async initAccessLog(): Promise<void> {
-    try {
-      await fs.access(this.accessLogPath);
-    } catch {
-      await fs.writeFile(this.accessLogPath, '{}', 'utf-8');
+  private async ensureUploadDirs() {
+    const dirs = ['avatars', 'articles'];
+    for (const dir of dirs) {
+      const path = join(this.uploadBasePath, dir);
+      await fs.mkdir(path, { recursive: true });
     }
   }
 
@@ -70,60 +68,57 @@ export class UploadService {
         return this.handleLocalUpload(file, options);
       }
     } catch (error) {
-      await this.safeDeleteFile(file.path);
-      throw new Error(`文件处理失败：${error.message}`);
+      this.logger.error(`上传失败: ${error.message}`);
+      throw error;
     }
   }
 
-  // Cloudinary 上传处理
   private async handleCloudinaryUpload(
     file: Express.Multer.File,
     options: UploadOptions,
   ): Promise<string> {
-    const { type, width, height, oldUrl } = options;
-    const folder = type === 'avatar' ? 'avatars' : 'articles';
-
-    // 如果存在旧文件，先删除
-    if (oldUrl) {
-      const publicId = this.getPublicIdFromUrl(oldUrl);
-      if (publicId) {
-        await cloudinary.uploader.destroy(publicId);
-      }
+    // 添加 Cloudinary 上传结果的类型定义
+    interface CloudinaryUploadResult {
+      secure_url: string;
+      public_id: string;
     }
 
-    // 上传到 Cloudinary
-    const result = await cloudinary.uploader
-      .upload(file.path, {
-        folder,
-        public_id: `${type}_${Date.now()}`, // 添加自定义文件名
-        resource_type: 'auto',
-        // 使用官方推荐的优化参数
-        fetch_format: 'auto',
-        quality: 'auto',
-        transformation: [
+    const result = await new Promise<CloudinaryUploadResult>(
+      (resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
           {
-            width,
-            height,
-            crop: 'fill',
-            gravity: 'auto', // 自动选择裁剪焦点
+            folder: options.type === 'avatar' ? 'avatars' : 'articles',
+            public_id: `${options.type}_${Date.now()}`,
+            resource_type: 'auto',
+            fetch_format: 'auto',
             quality: 'auto',
+            transformation: [
+              {
+                width: options.width,
+                height: options.height,
+                crop: 'fill',
+                gravity: 'auto',
+              },
+            ],
           },
-        ],
-      })
-      .catch((error) => {
-        this.logger.error('Cloudinary upload failed:', error);
-        throw new Error('文件上传失败');
-      });
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result as CloudinaryUploadResult);
+          },
+        );
 
-    // 返回优化后的 URL
+        uploadStream.end(file.buffer);
+      },
+    );
+
     return result.secure_url;
   }
 
-  // 本地上传处理（保持原有逻辑）
   private async handleLocalUpload(
     file: Express.Multer.File,
     options: UploadOptions,
   ): Promise<string> {
+    // ... 本地处理逻辑，使用 file.path
     const {
       type,
       compress = true,
@@ -132,34 +127,25 @@ export class UploadService {
       quality = 80,
       oldUrl,
     } = options;
-    const subDir = type === 'avatar' ? 'avatars' : 'articles';
-    const outputDir = join(this.uploadBasePath, subDir);
-
-    await fs.mkdir(outputDir, { recursive: true });
 
     if (oldUrl) {
       await this.deleteOldFile(oldUrl);
     }
 
     if (compress) {
-      const compressedFileName = `compressed_${file.filename}`;
-      const outputPath = join(outputDir, compressedFileName);
-
-      await sharp(file.buffer || file.path)
+      const outputPath = file.path;
+      await sharp(file.path)
         .resize(width, height, {
           fit: 'cover',
           position: 'center',
         })
         .jpeg({ quality, progressive: true })
-        .toFile(outputPath);
+        .toFile(outputPath + '_compressed');
 
-      await this.safeDeleteFile(file.path);
-      return `${this.apiUrl}/uploads/${subDir}/${compressedFileName}`;
+      await fs.rename(outputPath + '_compressed', outputPath);
     }
 
-    const finalPath = join(outputDir, file.filename);
-    await fs.rename(file.path, finalPath);
-    return `${this.apiUrl}/uploads/${subDir}/${file.filename}`;
+    return `${this.apiUrl}/uploads/${type}s/${file.filename}`;
   }
 
   // 从 Cloudinary URL 获取 public_id
