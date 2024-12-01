@@ -10,7 +10,7 @@
       }
     },
     {
-      "src": "admin/**",
+      "src": "admin/package.json",
       "use": "@vercel/static-build",
       "config": {
         "buildCommand": "cd admin && npm install && npm run build",
@@ -18,7 +18,7 @@
       }
     },
     {
-      "src": "website/**",
+      "src": "website/package.json",
       "use": "@vercel/next",
       "config": {
         "buildCommand": "cd website && npm install && npm run build",
