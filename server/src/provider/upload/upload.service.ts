@@ -4,6 +4,7 @@ import * as sharp from 'sharp';
 import { promises as fs } from 'fs';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
+import { v2 as cloudinary } from 'cloudinary';
 
 interface UploadOptions {
   type: 'avatar' | 'article' | 'image';
@@ -27,11 +28,24 @@ export class UploadService {
   private readonly uploadBasePath: string;
   private readonly apiUrl: string;
   private readonly accessLogPath: string;
+  private readonly isProduction: boolean;
 
   constructor(private configService: ConfigService) {
     this.uploadBasePath = join(__dirname, '../../../uploads');
     this.apiUrl = this.configService.get<string>('API_URL');
     this.accessLogPath = join(this.uploadBasePath, 'access_log.json');
+    this.isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
+
+    // 只在生产环境初始化 Cloudinary
+    if (this.isProduction) {
+      cloudinary.config({
+        cloud_name: this.configService.get('CLOUDINARY_CLOUD_NAME'),
+        api_key: this.configService.get('CLOUDINARY_API_KEY'),
+        api_secret: this.configService.get('CLOUDINARY_API_SECRET'),
+      });
+    }
+
     // 确保 access_log.json 存在
     this.initAccessLog();
   }
@@ -50,57 +64,103 @@ export class UploadService {
     options: UploadOptions,
   ): Promise<string> {
     try {
-      const {
-        type,
-        compress = true,
-        width = 256,
-        height = 256,
-        quality = 80,
-        oldUrl,
-      } = options;
-      const subDir = type === 'avatar' ? 'avatars' : 'articles';
-      const outputDir = join(this.uploadBasePath, subDir);
-
-      // 确保目录存在
-      await fs.mkdir(outputDir, { recursive: true });
-
-      // 如果存在旧文件，先删除
-      if (oldUrl) {
-        await this.deleteOldFile(oldUrl);
+      if (this.isProduction) {
+        return this.handleCloudinaryUpload(file, options);
+      } else {
+        return this.handleLocalUpload(file, options);
       }
-
-      if (compress) {
-        const compressedFileName = `compressed_${file.filename}`;
-        const outputPath = join(outputDir, compressedFileName);
-
-        // 压缩处理
-        const sharpInstance = sharp(file.path);
-        if (width || height) {
-          sharpInstance.resize(width, height, {
-            fit: 'cover',
-            position: 'center',
-          });
-        }
-
-        await sharpInstance
-          .jpeg({ quality, progressive: true })
-          .toFile(outputPath);
-
-        // 删除原文件
-        await this.safeDeleteFile(file.path);
-
-        return `${this.apiUrl}/uploads/${subDir}/${compressedFileName}`;
-      }
-
-      // 移动文件到正确的位置
-      const finalPath = join(outputDir, file.filename);
-      await fs.rename(file.path, finalPath);
-
-      return `${this.apiUrl}/uploads/${subDir}/${file.filename}`;
     } catch (error) {
-      // 清理临时文件
       await this.safeDeleteFile(file.path);
       throw new Error(`文件处理失败：${error.message}`);
+    }
+  }
+
+  // Cloudinary 上传处理
+  private async handleCloudinaryUpload(
+    file: Express.Multer.File,
+    options: UploadOptions,
+  ): Promise<string> {
+    const { type, width, height, quality, oldUrl } = options;
+    const folder = type === 'avatar' ? 'avatars' : 'articles';
+
+    // 如果存在旧文件，先从 Cloudinary 删除
+    if (oldUrl) {
+      const publicId = this.getPublicIdFromUrl(oldUrl);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId);
+      }
+    }
+
+    // 上传到 Cloudinary
+    const result = await cloudinary.uploader.upload(file.path, {
+      folder,
+      transformation: [
+        {
+          width,
+          height,
+          crop: 'fill',
+          quality,
+        },
+      ],
+    });
+
+    return result.secure_url;
+  }
+
+  // 本地上传处理（保持原有逻辑）
+  private async handleLocalUpload(
+    file: Express.Multer.File,
+    options: UploadOptions,
+  ): Promise<string> {
+    const {
+      type,
+      compress = true,
+      width = 256,
+      height = 256,
+      quality = 80,
+      oldUrl,
+    } = options;
+    const subDir = type === 'avatar' ? 'avatars' : 'articles';
+    const outputDir = join(this.uploadBasePath, subDir);
+
+    await fs.mkdir(outputDir, { recursive: true });
+
+    if (oldUrl) {
+      await this.deleteOldFile(oldUrl);
+    }
+
+    if (compress) {
+      const compressedFileName = `compressed_${file.filename}`;
+      const outputPath = join(outputDir, compressedFileName);
+
+      const sharpInstance = sharp(file.path);
+      if (width || height) {
+        sharpInstance.resize(width, height, {
+          fit: 'cover',
+          position: 'center',
+        });
+      }
+
+      await sharpInstance
+        .jpeg({ quality, progressive: true })
+        .toFile(outputPath);
+
+      await this.safeDeleteFile(file.path);
+      return `${this.apiUrl}/uploads/${subDir}/${compressedFileName}`;
+    }
+
+    const finalPath = join(outputDir, file.filename);
+    await fs.rename(file.path, finalPath);
+    return `${this.apiUrl}/uploads/${subDir}/${file.filename}`;
+  }
+
+  // 从 Cloudinary URL 获取 public_id
+  private getPublicIdFromUrl(url: string): string | null {
+    try {
+      const matches = url.match(/\/v\d+\/(.+?)\./);
+      return matches ? matches[1] : null;
+    } catch {
+      return null;
     }
   }
 

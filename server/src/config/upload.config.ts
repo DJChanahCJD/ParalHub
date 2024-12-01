@@ -16,7 +16,10 @@ export const createUploadConfig = (
   const defaultOptions = {
     maxSize: 5 * 1024 * 1024, // 默认5MB
     allowedTypes: /^image\/(jpg|jpeg|png|gif)$/,
-    destination: `./uploads/${type}s`,
+    destination:
+      process.env.NODE_ENV === 'production'
+        ? './uploads/temp' // 生产环境使用临时目录
+        : `./uploads/${type}s`, // 开发环境使用类型目录
   };
 
   const config = { ...defaultOptions, ...options };
