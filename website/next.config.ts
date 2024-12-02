@@ -58,13 +58,33 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@uiw/react-md-editor': '@uiw/react-md-editor/dist/mdeditor.js',
-    };
+  webpack: (config, isServer) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        "rehype": false,
+        "rehype-prism-plus": false,
+      }
+    }
+    // 确保正确处理 @uiw/react-md-editor
+    config.module.rules.push({
+      test: /\.m?js$/,
+      type: "javascript/auto",
+      resolve: {
+        fullySpecified: false,
+      },
+    });
+
     return config;
   },
+  transpilePackages: [
+    '@uiw/react-md-editor',
+    'rehype',
+    'rehype-prism-plus',
+    '@uiw/react-markdown-preview'
+  ],
 }
 
 export default nextConfig

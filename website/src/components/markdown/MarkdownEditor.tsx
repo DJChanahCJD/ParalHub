@@ -46,7 +46,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         size: file.size
       });
 
-      const imageUrl = await uploadImage(file);
+      const imageUrl = await uploadImage(file, 'article');
 
       console.log('图片上传成功', imageUrl);
 

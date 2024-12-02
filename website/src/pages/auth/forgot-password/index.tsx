@@ -65,11 +65,11 @@ export default function ForgotPasswordPage() {
         })
         router.push('/auth/login')
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         variant: 'destructive',
         title: '重置失败',
-        description: error.response?.data?.message || '未知错误',
+        description: (error as unknown as { response?: { data?: { message: string } } }).response?.data?.message || '未知错误',
         duration: 5000
       })
     } finally {
@@ -106,11 +106,11 @@ export default function ForgotPasswordPage() {
           return prev - 1
         })
       }, 1000)
-    } catch (error: any) {
+    } catch (error) {
       toast({
         variant: 'destructive',
         title: '发送失败',
-        description: error.response?.data?.message || '未知错误',
+        description: (error as unknown as { response?: { data?: { message: string } } }).response?.data?.message || '未知错误',
         duration: 5000
       })
     }

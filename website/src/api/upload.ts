@@ -30,12 +30,12 @@ export const changeAvatar = async (userId: string, file: File) => {
   }
 }
 
-export async function uploadImage(file: File, type?: string): Promise<string> {
+export async function uploadImage(file: File, type: string = 'article'): Promise<string> {
   const formData = new FormData()
   formData.append('image', file)
 
   const response = await api.post<UploadResponse>(
-    `/uploads/image${type ? `?type=${type}` : ''}`,
+    `/uploads/image?type=${type}`,
     formData,
     {
       headers: {

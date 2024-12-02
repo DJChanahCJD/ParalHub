@@ -9,14 +9,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, MessageSquare, Share2, Star, ThumbsUp, Eye, Clock, Flame } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import MDEditor from '@uiw/react-md-editor'
 import { ArticleCard } from '@/components/article/ArticleCard'
-import rehypeRaw from 'rehype-raw'
-import rehypeHighlight from 'rehype-highlight'
-import remarkGfm from 'remark-gfm'
-import '@uiw/react-markdown-preview/markdown.css';
-import '@uiw/react-md-editor/markdown-editor.css';
-import rehypePrism from 'rehype-prism-plus';
 import { CardPanel, CardPanelGroup } from '@/components/ui/card-panel'
 import { useStar } from '@/hooks/use-star'
 import { useAuth } from '@/hooks/auth-context'
@@ -38,7 +31,8 @@ import { useDelayedLoading } from '@/hooks/use-delayed-loading'
 import { useLike } from '@/hooks/use-like'
 import CommentSection from '@/components/comment/CommentSection'
 import { useInView } from 'react-intersection-observer'
-import { MarkdownEditor } from '@/components/editor/MarkdownEditor'
+import { MarkdownEditor } from '@/components/markdown/MarkdownEditor'
+import { MarkdownDisplay } from '@/components/markdown/MarkdownDisplay'
 
 // 定义表单验证模式
 const articleSchema = z.object({
@@ -599,28 +593,7 @@ export default function CasePage() {
                       />
                     </div>
                     <div className="px-6 py-4 min-h-[50vh]">
-                      <MDEditor.Markdown
-                        source={caseDetail.content}
-                        className={cn(
-                          "prose prose-sm dark:prose-invert max-w-none",
-                          "[&_h1]:mt-8 [&_h1]:mb-4 [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:pb-2 [&_h1]:border-b",
-                          "[&_h2]:mt-6 [&_h2]:mb-3 [&_h2]:text-xl [&_h2]:font-semibold",
-                          "[&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:text-lg [&_h3]:font-medium",
-                          "[&_p]:my-3 [&_p]:leading-relaxed",
-                          "[&_ul]:my-4 [&_ul]:list-disc [&_ul]:pl-6",
-                          "[&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-6",
-                          "[&_li]:my-2",
-                          "[&_code]:text-sm [&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded",
-                          "[&_pre]:my-4 [&_pre]:bg-muted [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto",
-                          "[&_hr]:my-6 [&_hr]:border-border",
-                          "[&_blockquote]:my-4 [&_blockquote]:pl-4 [&_blockquote]:border-l-4 [&_blockquote]:border-border [&_blockquote]:text-muted-foreground",
-                          "[&_table]:my-4 [&_table]:w-full [&_table]:border-collapse",
-                          "[&_th]:border [&_th]:border-border [&_th]:px-4 [&_th]:py-2 [&_th]:bg-muted",
-                          "[&_td]:border [&_td]:border-border [&_td]:px-4 [&_td]:py-2",
-                        )}
-                        rehypePlugins={[rehypeRaw, rehypeHighlight, rehypePrism]}
-                        remarkPlugins={[remarkGfm]}
-                      />
+                      <MarkdownDisplay content={caseDetail.content} />
                     </div>
                   </>
                 ),
@@ -695,15 +668,7 @@ export default function CasePage() {
                         </div>
                       ) : (
                         <div className="px-6 py-4 min-h-[50vh]">
-                          <MDEditor.Markdown
-                            source={selectedArticle.content}
-                            rehypePlugins={[rehypeRaw, rehypeHighlight, rehypePrism]}
-                            remarkPlugins={[remarkGfm]}
-                            className={cn(
-                              "prose prose-sm dark:prose-invert max-w-none",
-                              // ... Markdown 样式
-                            )}
-                          />
+                          <MarkdownDisplay content={selectedArticle.content} />
                         </div>
                       )}
 

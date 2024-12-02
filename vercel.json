@@ -5,7 +5,7 @@
       "src": "server/src/main.ts",
       "use": "@vercel/node",
       "config": {
-        "buildCommand": "cd server && npm install && npm run build",
+        "buildCommand": "cd server && npm install --no-frozen-lockfile && npm run build",
         "outputDirectory": "dist"
       }
     },
@@ -13,7 +13,7 @@
       "src": "admin/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "buildCommand": "cd admin && npm install && npm run build",
+        "buildCommand": "cd admin && npm install --no-frozen-lockfile && npm run build",
         "outputDirectory": "dist"
       }
     },
@@ -21,7 +21,7 @@
       "src": "website/package.json",
       "use": "@vercel/next",
       "config": {
-        "buildCommand": "cd website && npm install && npm run build",
+        "buildCommand": "cd website && npm install --no-frozen-lockfile && npm run build",
         "outputDirectory": ".next"
       }
     }

@@ -1,7 +1,8 @@
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { memoryStorage, diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
-import { extname } from 'path';
+import { extname, join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
 
 export interface UploadConfigOptions {
   maxSize?: number;
@@ -13,29 +14,39 @@ export const createUploadConfig = (
   options?: UploadConfigOptions,
 ): MulterOptions => {
   const defaultOptions = {
-    maxSize: 5 * 1024 * 1024, // 默认5MB
+    maxSize: 5 * 1024 * 1024,
     allowedTypes: /^image\/(jpg|jpeg|png|gif)$/,
   };
 
   const config = { ...defaultOptions, ...options };
   const isProduction = process.env.NODE_ENV === 'production';
+  const uploadPath = join(__dirname, '../../uploads', `${type}s`);
+  console.log('uploadPath', uploadPath);
+
+  if (!isProduction && !existsSync(uploadPath)) {
+    console.log(`创建上传目录: ${uploadPath}`);
+    mkdirSync(uploadPath, { recursive: true });
+  }
 
   return {
     storage: isProduction
-      ? memoryStorage() // 生产环境使用内存存储
+      ? memoryStorage()
       : diskStorage({
-          // 开发环境使用磁盘存储
-          destination: `./uploads/${type}s`,
-          filename: (req, file, callback) => {
+          destination: (req, file, cb) => {
+            console.log('type', type);
+            console.log('destination', uploadPath);
+            cb(null, uploadPath);
+          },
+          filename: (req, file, cb) => {
             const uniqueName = `${uuidv4()}${extname(file.originalname)}`;
-            callback(null, uniqueName);
+            cb(null, uniqueName);
           },
         }),
-    fileFilter: (req, file, callback) => {
+    fileFilter: (req, file, cb) => {
       if (!file.mimetype.match(config.allowedTypes)) {
-        return callback(new Error('不支持的文件类型！'), false);
+        return cb(new Error('不支持的文件类型！'), false);
       }
-      callback(null, true);
+      cb(null, true);
     },
     limits: {
       fileSize: config.maxSize,

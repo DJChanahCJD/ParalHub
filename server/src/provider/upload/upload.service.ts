@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { join } from 'path';
-import sharp from 'sharp';
-import { promises as fs } from 'fs';
+import * as sharp from 'sharp';
+import { existsSync, promises as fs } from 'fs';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import { v2 as cloudinary } from 'cloudinary';
@@ -31,7 +31,8 @@ export class UploadService {
   private readonly accessLogPath: string;
   constructor(private configService: ConfigService) {
     this.uploadBasePath = join(__dirname, '../../../uploads');
-    this.apiUrl = this.configService.get<string>('API_URL');
+    this.apiUrl =
+      this.configService.get<string>('API_URL') || 'http://localhost:3000';
     this.accessLogPath = join(this.uploadBasePath, 'access_log.json');
     this.isProduction =
       this.configService.get<string>('NODE_ENV') === 'production';
@@ -50,10 +51,26 @@ export class UploadService {
   }
 
   private async ensureUploadDirs() {
-    const dirs = ['avatars', 'articles'];
+    const dirs = ['articles', 'avatars', 'images'];
+
+    // 首先确保基础上传目录存在
+    const basePath = join(__dirname, '../../../uploads');
+    console.log(`检查基础目录是否存在: ${basePath}`);
+
+    if (!existsSync(basePath)) {
+      console.log(`创建基础目录: ${basePath}`);
+      await fs.mkdir(basePath, { recursive: true });
+    }
+
     for (const dir of dirs) {
-      const path = join(this.uploadBasePath, dir);
-      await fs.mkdir(path, { recursive: true });
+      const path = join(basePath, dir);
+      console.log(`准备创建目录: ${path}`);
+      if (!existsSync(path)) {
+        console.log(`目录不存在，创建: ${path}`);
+        await fs.mkdir(path, { recursive: true });
+      } else {
+        console.log(`目录已存在: ${path}`);
+      }
     }
   }
 
@@ -118,13 +135,12 @@ export class UploadService {
     file: Express.Multer.File,
     options: UploadOptions,
   ): Promise<string> {
-    // ... 本地处理逻辑，使用 file.path
     const {
       type,
       compress = true,
-      width = 256,
-      height = 256,
       quality = 80,
+      width,
+      height,
       oldUrl,
     } = options;
 
@@ -134,18 +150,44 @@ export class UploadService {
 
     if (compress) {
       const outputPath = file.path;
-      await sharp(file.path)
-        .resize(width, height, {
-          fit: 'cover',
-          position: 'center',
-        })
-        .jpeg({ quality, progressive: true })
-        .toFile(outputPath + '_compressed');
+      console.log(`处理压缩图片type: ${type}, ${outputPath}`);
+      try {
+        const image = sharp(file.path);
 
-      await fs.rename(outputPath + '_compressed', outputPath);
+        // 根据图片类型使用不同的处理策略
+        if (type === 'avatar') {
+          // 头像固定尺寸，使用裁切
+          await image
+            .resize(256, 256, {
+              fit: 'cover',
+              position: 'center',
+            })
+            .jpeg({ quality, progressive: true })
+            .toFile(outputPath + '_compressed');
+        } else {
+          // 文章图片保持原比例
+          const resizeOptions: sharp.ResizeOptions = {
+            fit: 'inside', // 保持原比例
+            withoutEnlargement: true, // 不放大小图
+          };
+
+          // 如果指定了最大宽度或高度，则添加限制
+          if (width) resizeOptions.width = width;
+          if (height) resizeOptions.height = height;
+
+          await image
+            .resize(resizeOptions)
+            .jpeg({ quality, progressive: true })
+            .toFile(outputPath + '_compressed');
+        }
+
+        await fs.rename(outputPath + '_compressed', outputPath);
+      } catch (error) {
+        throw new Error('图片处理失败\n' + error);
+      }
     }
-
-    return `${this.apiUrl}/uploads/${type}s/${file.filename}`;
+    // 待优化（根据type返回不同路径）
+    return `${this.apiUrl}/uploads/images/${file.filename}`;
   }
 
   // 从 Cloudinary URL 获取 public_id
