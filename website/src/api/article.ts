@@ -40,6 +40,12 @@ export const getCaseArticles = async (
     return data
   }
 
+  // 仅根据文章ID获取文章详情
+  export const getArticleById = async (articleId: string): Promise<CaseArticle> => {
+    const { data } = await api.get(`/article/${articleId}`)
+    return data
+  }
+
   // 点赞文章
   export const likeCaseArticle = async (caseId: string, articleId: string) => {
     const { data } = await api.post(`/case/${caseId}/articles/${articleId}/like`)
@@ -57,5 +63,20 @@ export const getArticlesByUserId = async (
   query: ArticleQuery,
 ): Promise<PaginatedResponse<CaseArticle>> => {
   const { data } = await api.get(`/article/user/${userId}`, { params: query })
+  return data
+}
+
+// 更新文章
+export const updateArticle = async (
+  articleId: string,
+  data: Partial<CaseArticle>
+) => {
+  const { data: res } = await api.put(`/article/${articleId}`, data)
+  return res
+}
+
+// 删除文章
+export const deleteArticle = async (articleId: string) => {
+  const { data } = await api.delete(`/article/${articleId}`)
   return data
 }

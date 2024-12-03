@@ -21,8 +21,7 @@
       "src": "website/package.json",
       "use": "@vercel/next",
       "config": {
-        "buildCommand": "cd website && npm install --no-frozen-lockfile && npm run build",
-        "outputDirectory": ".next"
+        "root": "website"
       }
     }
   ],
@@ -37,7 +36,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "website/.next/$1"
+      "dest": "/$1"
     }
   ],
   "env": {

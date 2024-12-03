@@ -18,6 +18,18 @@ export const getCaseList = async (
   return data
 }
 
+// 更新案例
+export const updateCase = async (id: string, data: Partial<CaseItem>) => {
+  const { data: res } = await api.put(`/case/${id}`, data)
+  return res
+}
+
+// 删除案例
+export const deleteCase = async (id: string) => {
+  const { data } = await api.delete(`/case/${id}`)
+  return data
+}
+
 // 点赞案例
 export const toggleStarCase = async (caseId: string) => {
   const { data } = await api.post(`/case/${caseId}/star`)

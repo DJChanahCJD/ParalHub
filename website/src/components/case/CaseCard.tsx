@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CalendarDays, Star, StarIcon } from 'lucide-react'
+import { CalendarDays, Star, StarIcon, MoreVertical, Edit, Trash2 } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -8,7 +8,15 @@ import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/auth-context'
 import { useToast } from '@/hooks/use-toast'
 import { useState } from 'react'
-// import router from 'next/router'
+import { useRouter } from 'next/navigation'
+import { deleteCase } from '@/api/case'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog'
 
 // 定义案例卡片的属性接口
 interface CaseCardProps extends CaseItem {
@@ -31,6 +39,8 @@ export function CaseCard({
   const { toast } = useToast()
   const [localIsStarred, setLocalIsStarred] = useState(initialIsStarred)
   const [localStars, setLocalStars] = useState(stars)
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false)
+  const router = useRouter()
 
   const handleStarClick = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -55,10 +65,33 @@ export function CaseCard({
     }
   }
 
-  // const navigateToProfile = (e: React.MouseEvent, userId: string) => {
-  //   e.preventDefault()
-  //   router.push(`/profile/${userId}`)
-  // }
+  // 判断是否为作者
+  const isAuthor = user?._id === authorId._id
+
+  // 编辑案例
+  const handleEdit = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    router.push(`/case/${_id}/edit`)
+  }
+
+  // 删除案例
+  const handleDelete = async () => {
+    try {
+      await deleteCase(_id)
+      toast({
+        title: '删除成功',
+        description: '案例已成功删除',
+      })
+      router.refresh()
+    } catch (error) {
+      toast({
+        title: '删除失败',
+        description: String(error),
+        variant: 'destructive',
+      })
+    }
+  }
 
   return (
     <Card className="group hover:border-[hsl(var(--primary)/0.5)] hover:shadow-sm hover:shadow-[hsl(var(--primary)/0.1)] transition-all duration-200">
@@ -132,9 +165,57 @@ export function CaseCard({
               <CalendarDays className="h-4 w-4 inline-block mr-1" />
               {formatDate(updatedAt.toString())}
             </time>
+            {isAuthor && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    title="更多操作"
+                    className="h-8 w-8 p-0 flex items-center justify-center ml-auto -mr-2"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleEdit}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    编辑
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onClick={() => setShowDeleteAlert(true)}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    删除
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </CardContent>
       </Link>
+
+
+      {/* 删除确认对话框 */}
+      <AlertDialog
+        open={showDeleteAlert}
+        onOpenChange={setShowDeleteAlert}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除</AlertDialogTitle>
+            <AlertDialogDescription>
+              此操作不可撤销，确定要删除这个案例吗？
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>
+              删除
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   )
 }
