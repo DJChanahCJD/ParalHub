@@ -36,50 +36,63 @@ export class DeveloperUserProvider extends BaseUserProvider<DeveloperUser> {
   }
 
   async register(userData: RegisterDeveloperUserDto) {
-    console.log('register provider', userData);
+    console.log('=== 开始注册流程 ===');
     try {
       // 1. 验证必填字段
+      console.log('1. 验证必填字段');
       if (!userData.email || (!userData.password && !userData.emailCaptcha)) {
         throw new BadRequestException('缺少必要信息');
       }
 
       // 2. 验证邮箱是否已存在
+      console.log('2. 验证邮箱是否已存在');
       const existingUser = await this.userModel.findOne({
         email: userData.email,
       });
       if (existingUser) {
         throw new BadRequestException('该邮箱已被注册');
       }
+
       // 3. 验证验证码
+      console.log('3. 开始验证验证码');
       const isValid = await this.verifyCaptcha(
         userData.email,
         userData.emailCaptcha,
         'register',
       );
+      console.log('验证码验证结果:', isValid);
+
       if (!isValid) {
         throw new BadRequestException('验证码无效或已过期');
       }
 
       // 4. 验证特定规则
+      console.log('4. 验证特定规则');
       await this.validateUserSpecificRules(userData);
 
       // 5. 密码加密
+      console.log('5. 密码加密');
       const hashedPassword = await bcrypt.hash(userData.password, 10);
 
-      // 6. 创建用户（直接使用 new 和 save）
+      const phone =
+        userData.phone && userData.phone.trim() !== '' ? userData.phone : null;
+
+      // 6. 创建用户
+      console.log('6. 创建用户');
       const newUser = new this.userModel({
         ...userData,
-        role: UserRole.DEVELOPER, // 显式设置角色
+        role: UserRole.DEVELOPER,
         password: hashedPassword,
-        username: userData.username || userData.email, // 如果没有提供用户名，使用邮箱
+        username: userData.username || userData.email,
+        phone,
       });
       await newUser.save();
 
       // 7. 生成 token
-      console.log('newUser: ', newUser);
+      console.log('7. 生成 token');
       const token = await this.authService.generateToken(newUser);
-      console.log('注册成功');
-      // 8. 返回结果
+
+      console.log('=== 注册流程完成 ===');
       return {
         status: 'success',
         message: '注册成功',
@@ -95,6 +108,7 @@ export class DeveloperUserProvider extends BaseUserProvider<DeveloperUser> {
         },
       };
     } catch (error) {
+      console.error('注册过程发生错误:', error);
       throw new BadRequestException(error.message);
     }
   }

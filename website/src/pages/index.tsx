@@ -27,7 +27,8 @@ export default function Home() {
   const [filters, setFilters] = useState({
     tags: [] as string[],
     sortField: 'updatedAt',
-    sortOrder: 'descend' as 'descend' | 'ascend'
+    sortOrder: 'descend' as 'descend' | 'ascend',
+    authorType: 'all'
   })
 
   // 分页状态
@@ -44,6 +45,7 @@ export default function Home() {
   // 监听搜索状态变化
   useEffect(() => {
     setIsHeroVisible(!searchParams.get('q'))
+    fetchCases()
   }, [searchParams])
 
   // 获取案例表
@@ -56,6 +58,7 @@ export default function Home() {
           ...(filters.tags.length > 0 && { tags: filters.tags }),
           sortField: filters.sortField,
           sortOrder: filters.sortOrder,
+          ...(filters.authorType !== 'all' && { authorType: filters.authorType }),
           ...(searchParams.get('q') && { title: searchParams.get('q') || undefined })
         })
 

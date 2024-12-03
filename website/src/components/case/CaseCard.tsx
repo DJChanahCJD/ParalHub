@@ -55,7 +55,7 @@ export function CaseCard({
 
     setLocalIsStarred(prev => !prev)
     setLocalStars(prev => prev + (localIsStarred ? -1 : 1))
-
+    
     try {
       await onStarClick?.()
     } catch (error) {

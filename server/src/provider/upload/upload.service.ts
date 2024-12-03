@@ -187,7 +187,7 @@ export class UploadService {
       }
     }
     // 待优化（根据type返回不同路径）
-    return `${this.apiUrl}/uploads/images/${file.filename}`;
+    return `${this.apiUrl}/uploads/${type === 'avatar' ? 'avatars' : 'images'}/${file.filename}`;
   }
 
   // 从 Cloudinary URL 获取 public_id

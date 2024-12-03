@@ -1,7 +1,7 @@
 import { memo, useState, useCallback } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { ThumbsUp, MessageCircle, ChevronDown, Loader2, Trash2, Reply } from 'lucide-react'
+import { ThumbsUp, MessageCircle, ChevronDown, Loader2, Trash2, Reply, Crown } from 'lucide-react'
 import { cn, formatDate } from '@/lib/utils'
 import type { Comment, User } from '@/types/comment'
 import { useToast } from '@/hooks/use-toast'
@@ -13,6 +13,7 @@ interface CommentItemProps {
   comment: Comment
   currentUser?: User | null
   onCommentUpdate?: (comment: Comment) => void
+  articleAuthorId?: string
 }
 
 // 统一的按钮样式常量
@@ -29,6 +30,7 @@ export const CommentItem = memo(function CommentItem({
   comment: initialComment,
   currentUser,
   onCommentUpdate,
+  articleAuthorId
 }: CommentItemProps) {
   const [comment, setComment] = useState(initialComment)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -202,13 +204,19 @@ export const CommentItem = memo(function CommentItem({
       <div className="w-full group/item">
         <div className="flex-1 space-y-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 cursor-pointer hover:underline hover:text-primary" onClick={navigateToUserProfile}>
+            <div className="flex items-center gap-3 cursor-pointer hover:text-primary" onClick={navigateToUserProfile}>
               <Avatar className="w-8 h-8">
                 <AvatarImage src={comment.userId?.avatar || ''} alt={comment.userId?.username || '注销用户'} />
                 <AvatarFallback>{comment.userId?.username[0] || '注'}</AvatarFallback>
               </Avatar>
               <div className="flex items-center gap-2">
-                <span className="font-medium">{comment.userId?.username || '注销用户'}</span>
+                <span className="font-medium hover:underline">{comment.userId?.username || '注销用户'}</span>
+                {articleAuthorId === comment.userId?._id && (
+                  <span className="px-1.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary rounded">
+                    <Crown className="h-4 w-4 inline-block mr-1" />
+                    作者
+                  </span>
+                )}
               </div>
             </div>
             <span className="text-sm text-muted-foreground">

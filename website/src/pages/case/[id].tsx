@@ -299,6 +299,7 @@ export default function CasePage() {
           article={article}
           onClick={() => handleArticleClick(article._id)}
           className="cursor-pointer transition-colors hover:bg-muted/50"
+          isCaseAuthor={article.authorId?._id === caseDetail?.authorId?._id}
         />
       ))}
 
@@ -677,6 +678,7 @@ export default function CasePage() {
                         <CommentSection
                           articleId={selectedArticle._id}
                           onCommentChange={handleCommentCountChange}
+                          articleAuthorId={selectedArticle.authorId?._id}
                         />
                       </div>
                     </div>

@@ -11,6 +11,7 @@ interface CommentListProps {
   hasMore: boolean
   onLoadMore: () => void
   onCommentUpdate: (comment: Comment) => void
+  articleAuthorId?: string
 }
 
 export const CommentList = memo(function CommentList({
@@ -20,6 +21,7 @@ export const CommentList = memo(function CommentList({
   hasMore,
   onLoadMore,
   onCommentUpdate,
+  articleAuthorId
 }: CommentListProps) {
   return (
     <div className="space-y-6">
@@ -35,6 +37,7 @@ export const CommentList = memo(function CommentList({
                 comment={comment}
                 currentUser={currentUser}
                 onCommentUpdate={onCommentUpdate}
+                articleAuthorId={articleAuthorId}
               />
             </div>
           ))}

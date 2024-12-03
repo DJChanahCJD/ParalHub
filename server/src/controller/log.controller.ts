@@ -167,11 +167,11 @@ export class LogController {
     @Query('current') current: number = 1,
     @Query('pageSize') pageSize: number = 20,
     @Query('ip') ip?: string,
+    @Query('sortOrder') sortOrder: 'ascend' | 'descend' = 'descend',
     @Query('address') address?: string,
     @Query('event') event?: string,
     @Query('success') success?: string,
     @Query('sortField') sortField?: string,
-    @Query('sortOrder') sortOrder?: 'ascend' | 'descend',
   ) {
     try {
       const logs = await this.logService.readLogs('system');
@@ -191,7 +191,7 @@ export class LogController {
           const ipAddress = log.metadata?.ip || '-';
           return {
             time: log.timestamp,
-            event: log.message.split(' ')[1] || '', // 只保留路径部分
+            event: log.message,
             ip: ipAddress,
             address: (await this.getLocationByIp(ipAddress)) || '-',
             success: log.metadata?.status >= 200 && log.metadata?.status < 400,

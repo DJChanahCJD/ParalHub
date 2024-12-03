@@ -9,6 +9,7 @@ interface FilterOptions {
   tags: string[]
   sortField: string
   sortOrder: 'ascend' | 'descend'
+  authorType: string
 }
 
 // 定义组件属性接口
@@ -74,6 +75,23 @@ export function CaseFilters({ filters, onFilterChange, onSortChange }: CaseFilte
               >
                 Most Starred
               </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* 作者类型筛选 */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Author Type</label>
+          <Select
+            value={filters.authorType}
+            onValueChange={(value) => onFilterChange('authorType', value)}
+          >
+            <SelectTrigger className="hover:border-[hsl(var(--primary))] focus:border-[hsl(var(--primary))]">
+              <SelectValue placeholder="Select author type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="enterprise">Enterprise</SelectItem>
             </SelectContent>
           </Select>
         </div>

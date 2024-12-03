@@ -2,7 +2,7 @@ import { CaseArticle } from '@/types/case'
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { CalendarDays, Eye, MessageSquare, ThumbsUp, MoreVertical, Edit, Trash2 } from 'lucide-react'
+import { CalendarDays, Eye, MessageSquare, ThumbsUp, MoreVertical, Edit, Trash2, ShieldCheck } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/auth-context'
@@ -25,9 +25,10 @@ interface ArticleCardProps {
   onClick?: () => void
   isSelected?: boolean
   caseId?: string
+  isCaseAuthor?: boolean
 }
 
-export function ArticleCard({ article, className, onClick, isSelected, caseId }: ArticleCardProps) {
+export function ArticleCard({ article, className, onClick, isSelected, caseId, isCaseAuthor }: ArticleCardProps) {
   const { user } = useAuth()
   const { toast } = useToast()
   const [showDeleteAlert, setShowDeleteAlert] = useState(false)
@@ -64,9 +65,9 @@ export function ArticleCard({ article, className, onClick, isSelected, caseId }:
   }
 
   // 从文章内容中提取标题和预览
-  const lines = article.content.split('\n')
-  const title = lines[0].replace('# ', '')
-  const preview = article.content.slice(0, Math.min(64, article.content.length))
+  const lines = article.content?.split('\n') || []
+  const title = article.title
+  const preview = lines?.[1]?.slice(0, Math.min(64, lines?.[1]?.length)) || ''
 
   // 如果没有提供 onClick，则使用默认的链接处理
   const handleClick = onClick || (() => {
@@ -165,6 +166,12 @@ export function ArticleCard({ article, className, onClick, isSelected, caseId }:
                 <CalendarDays className="h-4 w-4 inline-block mr-1" />
                 {formatDate(article.updatedAt.toString())}
               </span>
+              {isCaseAuthor && (
+                <span className="px-1.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary rounded inline-flex items-center">
+                  <ShieldCheck className="h-4 w-4 mr-1" />
+                  官方
+                </span>
+              )}
             </div>
 
             {/* 统计信息 */}

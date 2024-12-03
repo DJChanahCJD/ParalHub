@@ -16,9 +16,10 @@ type SortType = 'latest' | 'popular'
 type CommentSectionProps = {
   articleId: string
   onCommentChange?: (count: number) => void
+  articleAuthorId?: string
 }
 
-export default function CommentSection({ articleId, onCommentChange }: CommentSectionProps) {
+export default function CommentSection({ articleId, onCommentChange, articleAuthorId }: CommentSectionProps) {
   // 评论输入状态
   const [content, setContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -235,6 +236,7 @@ export default function CommentSection({ articleId, onCommentChange }: CommentSe
         hasMore={hasMore}
         onLoadMore={() => loadComments(true)}
         onCommentUpdate={handleCommentUpdate}
+        articleAuthorId={articleAuthorId}
       />
     </div>
   )

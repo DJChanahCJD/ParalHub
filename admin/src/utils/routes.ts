@@ -13,7 +13,7 @@ export const ROUTES = {
 } as const;
 
 // 获取前台URL
-const getWebsiteBaseUrl = () => {
+export const getWebsiteBaseUrl = () => {
   return process.env.REACT_APP_WEBSITE_URL || 'http://localhost:8001/'  // 开发环境
 }
 

@@ -119,13 +119,23 @@ export class CommentService {
   async getArticleComments(
     articleId: string,
     params: ArticleCommentQuery,
-  ): Promise<{ data: Comment[]; total: number }> {
+  ): Promise<{ data: Comment[]; total: number; caseId: string }> {
     const {
       pageSize = 10,
       current = 1,
       sortField = 'createdAt',
       sortOrder = 'descend',
     } = params;
+
+    // 获取文章信息以获取 caseId
+    const article = await this.articleModel
+      .findById(articleId)
+      .select('caseId')
+      .lean();
+
+    if (!article) {
+      throw new NotFoundException('文章不存在');
+    }
 
     // 只获取主评论，不包含回复
     const comments = await this.commentModel
@@ -158,6 +168,7 @@ export class CommentService {
     return {
       data: commentsWithReplyCount as unknown as Comment[],
       total,
+      caseId: article.caseId.toString(), // 添加 caseId 到返回结果
     };
   }
 
@@ -299,6 +310,8 @@ export class CommentService {
             $project: {
               _id: 1,
               title: 1,
+              caseId: 1, // 确保包含 caseId
+              // ... 其他需要的文章字段
             },
           },
         ],
@@ -328,9 +341,11 @@ export class CommentService {
   }
 
   // 获取管理员评论列表
-  async getAdminComments(
-    params: AdminCommentQuery,
-  ): Promise<{ items: Comment[]; total: number; success: boolean }> {
+  async getAdminComments(params: AdminCommentQuery): Promise<{
+    items: Comment[];
+    total: number;
+    success: boolean;
+  }> {
     const {
       current = 1,
       pageSize = 10,
@@ -396,6 +411,7 @@ export class CommentService {
         updatedAt: 1,
         userId: '$userInfo',
         articleId: { $arrayElemAt: ['$articleInfo', 0] },
+        caseId: { $toString: { $arrayElemAt: ['$articleInfo.caseId', 0] } }, // 添加 caseId
         parentId: 1,
         replyToId: 1,
         replyToUserId: 1,

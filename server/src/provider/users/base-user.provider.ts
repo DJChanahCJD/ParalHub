@@ -231,9 +231,14 @@ export abstract class BaseUserProvider<T extends BaseUser> {
     captcha: string,
     type: keyof typeof this.emailCaptchaType,
   ): Promise<boolean> {
+    console.log('=== 验证码验证信息 ===');
+    console.log('Email:', email);
+    console.log('Input Code:', captcha);
+    console.log('Type:', type);
     const cacheKey = `${type}_captcha:${email}`;
     const storedData = await this.redisClient.get(cacheKey);
-
+    console.log('cacheKey:', cacheKey);
+    console.log('Stored Data:', storedData);
     if (!storedData) {
       return false;
     }
@@ -242,10 +247,10 @@ export abstract class BaseUserProvider<T extends BaseUser> {
     const isValid = captchaData.code === captcha && captchaData.type === type;
 
     if (isValid) {
+      console.log('验证码验证成功');
       // 验证成功后立即删除验证码
       await this.redisClient.del(cacheKey);
     }
-
     return isValid;
   }
 

@@ -32,6 +32,7 @@ export class CaseProvider {
     authorId?: string;
     sortField?: string;
     sortOrder?: 'ascend' | 'descend';
+    authorType?: string;
   }): Promise<{ items: Case[]; total: number; success: boolean }> {
     const {
       current = 1,
@@ -43,6 +44,7 @@ export class CaseProvider {
       authorId,
       sortField = 'createdAt',
       sortOrder = 'descend',
+      authorType,
     } = params;
     console.log('params from case provider', params);
     // 构建基础查询条件
@@ -53,6 +55,7 @@ export class CaseProvider {
     if (content) query.content = { $regex: content, $options: 'i' };
     if (tags?.length) query.tags = { $all: tags };
     if (authorId) query.authorId = authorId.toString(); // 精准匹配
+    if (authorType === 'enterprise') query['authorId.role'] = 'enterprise';
     // 使用 Mongoose 的 populate 功能
     const [items, total] = await Promise.all([
       this.caseModel
@@ -61,7 +64,7 @@ export class CaseProvider {
         .skip((Number(current) - 1) * Number(pageSize))
         .limit(Number(pageSize))
         .populate('tags', 'name')
-        .populate('authorId', 'username email avatar')
+        .populate('authorId', 'username email avatar role')
         .lean(),
       this.caseModel.countDocuments(query),
     ]);
@@ -93,6 +96,9 @@ export class CaseProvider {
    * @returns 创建的案例
    */
   async create(data: Partial<Case>): Promise<Case> {
+    if (!data.description) {
+      data.description = data.content.slice(0, 64);
+    }
     const newCase = await this.caseModel.create(data);
     const authorCollection = getCollectionName(data.authorModel as ModelName);
 
@@ -143,14 +149,14 @@ export class CaseProvider {
       );
 
       // 更新案例的收藏计数
-      // const updatedCase = await this.caseModel
-      //   .findByIdAndUpdate(
-      //     id,
-      //     { $inc: { stars: isStarred ? 1 : -1 } }, // 更新计数
-      //     { new: true },
-      //   )
-      //   .populate('tags', 'name')
-      //   .populate('authorId', 'username email avatar');
+      await this.caseModel
+        .findByIdAndUpdate(
+          id,
+          { $inc: { stars: isStarred ? 1 : -1 } }, // 更新计数
+          { new: true },
+        )
+        .populate('tags', 'name')
+        .populate('authorId', 'username email avatar');
 
       return {
         success: true,

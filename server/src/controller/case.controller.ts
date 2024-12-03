@@ -130,7 +130,7 @@ export class CaseController {
         ...query,
         caseId,
       });
-      console.log('articles from case controller', articles);
+      console.log('get articles from case controller');
       return articles;
     } catch (error) {
       throw new BadRequestException(

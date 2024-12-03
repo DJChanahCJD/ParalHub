@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { UserOutlined, FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 import { TableLink } from '@/components/TableLink';
-import { ROUTES, createWebsiteLink } from '@/utils/routes';
+import { ROUTES, createWebsiteLink, getWebsiteBaseUrl } from '@/utils/routes';
 import { handleBatchDelete } from '@/utils/batchDelete';
 import { deleteComment, getComments, addComment } from '@/services/paral-hub/comment';
 import { getArticles } from '@/services/paral-hub/article';
@@ -90,7 +90,7 @@ const CommentManage: React.FC = () => {
       },
       render: (_, record) => (
         <TableLink
-          href={createWebsiteLink(ROUTES.WEBSITE.ARTICLE, record.articleId?._id)}
+          href={`${getWebsiteBaseUrl()}${ROUTES.WEBSITE.CASE}/${record.caseId || record.articleId?.caseId}?tab=articles&articleId=${record.articleId?._id}`}
           className="flex items-center gap-2"
         >
           <FileTextOutlined />
@@ -225,6 +225,7 @@ const CommentManage: React.FC = () => {
             data: response.items,
             success: true,
             total: response.total,
+            caseId: response.caseId,
           };
         }}
         columns={columns}
